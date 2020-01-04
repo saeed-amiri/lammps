@@ -1,0 +1,133 @@
+#! 07.01.2019: TRICLINIC VERSION; 08.10.2019: GRAIN VERSION!! 27.11.2019: T=0
+log LOG.0
+shell "cp in.lmp in.0"
+shell "echo 0 $(date +%d-%b-%Y-%T) START >> JOBINFO"
+
+units lj
+dimension 2
+boundary p p p
+atom_style bond
+
+
+#! some variable for setting the structure
+    variable slideLENGHT equal XX
+    variable boxX equal ${slideLENGHT}*10
+    variable boxY equal ${slideLENGHT}*10
+
+#! defining the whole region (potential surface)
+    lattice none 1.0
+    region REGION block 0 ${boxX} 0 ${boxY} -0.05 0.05
+    create_box 2 REGION bond/types 1 extra/bond/per/atom 6
+
+#! defining the slider
+    lattice hex 1.154700538379250
+    variable yhigh equal yhi
+    variable yscale equal ${slideLENGHT}*sqrt(3)
+    variable yi equal (${yhigh}-${yscale})/4
+    variable yf equal ${yi}+${slideLENGHT}
+    variable xf equal ${yscale}
+    region SLIDER block 0 ${xf} ${yi} ${yf} -0.05 0.05 
+    create_atoms 1 region SLIDER
+
+#! incommensurate lattice; nx is the number of cells along box edge
+    #-> Golden ratio
+    variable gold equal 0.5*(1+sqrt(5))
+    variable nxx equal floor(v_boxX*v_gold)
+#! incommensurate rho
+    variable rho equal 1.154700538379250*(v_nxx/v_boxX)^2
+    variable nyy equal floor(v_boxY*v_gold)
+    variable check equal v_nxx/v_boxX==v_nyy/v_boxY    
+    if "${check}!=1" then "print 'ERROR: lattice does not fit'" "quit"
+#! include random shift of basis atom (!)
+    variable RANX equal RAN
+    variable RANY equal floor(RAN*v_gold)
+    variable dx equal random(0,1,${RANX})
+    variable dy equal random(0,1,${RANY})
+    lattice hex ${rho} origin ${dx} ${dy} 0
+    region SUB block 0 ${nxx} 0 ${nyy} -0.05 0.05 units lattice 
+    create_atoms 2 region SUB
+#! return lattice constant to 1.0
+    lattice none 1.0
+
+#! set the "mass"
+    mass * 1.0
+    write_data init.0
+#! set groups    
+    group MOBILE type 1
+    group STATIC type 2
+
+#! set interaction between MOBILE and STATIC groups
+    pair_style soft 1.5
+    pair_coeff * * 0.0
+#! interaction strength values 0.1 - 0.3 seem reasonable
+    pair_coeff 1 2 0.3 RC
+#! create substrate bonds
+    bond_style vink
+#! potential energy = (FC/2) x**2
+#! OPTION 1: LJ bonds
+    bond_coeff 1 1 36 -252 1113
+    create_bonds many MOBILE MOBILE 1 0.99 1.01
+
+#! INCREASE EFFICIENCY: explicitly tell lammps to __NOT__ consider the following pair interactions [ONLY DO THIS AFTER THE BONDS HAVE BEEN CREATED]
+    neigh_modify exclude type 1 1 exclude type 2 2 
+
+#! keep things 2D
+    fix 2D all enforce2d
+
+#! store starting positions of substrate; we need them later to make the movie
+    dump PCA MOBILE custom 1 initdump.0 id type mass x y
+        run 0
+    undump PCA
+
+#! MODIFICATION: I think the displacements should be measured from the perfect lattice positions
+    compute R MOBILE displace/atom
+#! minimizing the Slider
+    fix FREEZE STATIC setforce 0 0 0
+    minimize 1e-12 1e-6 10000 1000
+# some minimizers use velocities: set these back to zero (!)
+    velocity all set 0 0 0
+    unfix FREEZE
+    reset_timestep 0
+
+    dump PCA MOBILE custom 1 mindump.0 id type x y vx vy
+        run 0
+    undump PCA
+
+#! compute velocity in x and y averaged over all particles
+    compute VEL MOBILE reduce ave vx vy
+    compute TEMP MOBILE temp
+
+#! compute displacement in x and y averaged over all particles
+    compute DSP MOBILE reduce ave c_R[1] c_R[2]
+#! displacement of each atom, with the average subtracted
+    variable DX atom c_R[1]-c_DSP[1]
+    variable DY atom c_R[2]-c_DSP[2]
+    variable UX atom vx-c_VEL[1]
+    variable UY atom vy-c_VEL[2]
+#! compute the kinetic energey
+    variable S atom "0.5 * ( (v_UX)^2 + (v_UY)^2 )"
+    compute KES MOBILE reduce sum v_S
+
+#! KICK IT!
+    variable VKICK   equal KICK
+    variable VANGEL  equal ANGEL
+    variable KICKX equal ${VKICK}*cos(${VANGEL})
+    variable KICKY equal ${VKICK}*sin(${VANGEL})
+    velocity MOBILE set ${KICKX} ${KICKY} 0 sum yes
+#! write data to LOG
+    thermo NEVERY
+    thermo_style custom step c_TEMP c_VEL[*] c_DSP[*] ebond ke c_KES
+    thermo_modify norm no
+
+#! dump
+    dump PCA MOBILE custom @NEVERY snap.0.gz id type mass x y v_DX v_DY vx vy c_R[*] fx fy
+
+#! also collect velocity histograms, to monitor equilibration
+    fix VX_HISTOGRAM MOBILE ave/histo NEVERY 1 NEVERY -0.1 0.1 51 vx ave one mode vector beyond ignore file hvx.0
+    fix VY_HISTOGRAM MOBILE ave/histo NEVERY 1 NEVERY -0.1 0.1 51 vy ave one mode vector beyond ignore file hvy.0
+#! integeration
+    fix NVE MOBILE nve
+#! run
+    run NRUN
+
+shell "echo 0 $(date +%d-%b-%Y-%T) FINISH >> JOBINFO"
