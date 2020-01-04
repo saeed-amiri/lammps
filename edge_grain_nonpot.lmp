@@ -34,8 +34,8 @@ atom_style bond
 
 #! set the "mass"
     mass * 1.0
-    write_data init.0
-#! set the Zigzag-edge groups
+
+#! select the Zigzag-edge particles
     variable zigi equal xlo
     variable zigf equal floor(${xf})
     variable ZIGi atom (${zigi}-0.00005<=x)&&(x<=${zigi}+0.5+0.00005)
@@ -47,6 +47,11 @@ atom_style bond
     set group ZIGi type 2
     group ZIGf variable ZIGf
     set group ZIGf type 3
+
+#! move slider to the center of the box
+    variable xmid equal (xhi-${xf})/2
+    displace_atoms MOBILE move ${xmid} 0 0 units lattice
+    write_data INIT.0
 
 #! set interaction between MOBILE and STATIC groups
     pair_style soft 1.5
