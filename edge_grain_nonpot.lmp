@@ -115,7 +115,7 @@ atom_style bond
     thermo_modify norm no
 
 #! dump
-    dump PCA MOBILE custom @NEVERY snap.0.gz id type mass x y v_DX v_DY vx vy c_R[*] fx fy
+    dump PCA MOBILE custom @NEVERY traj.0.gz id type mass x y v_DX v_DY vx vy c_R[*] fx fy
 
 #! also collect velocity histograms, to monitor equilibration
     fix VX_HISTOGRAM MOBILE ave/histo NEVERY 1 NEVERY -0.1 0.1 51 vx ave one mode vector beyond ignore file hvx.0
