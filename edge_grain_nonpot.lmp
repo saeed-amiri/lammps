@@ -51,7 +51,6 @@ atom_style bond
 #! move slider to the center of the box
     variable xmid equal (xhi-${xf})/2
     displace_atoms MOBILE move ${xmid} 0 0 units lattice
-    write_data INIT.0
 
 #! set interaction between MOBILE and STATIC groups
     pair_style soft 1.5
@@ -64,6 +63,7 @@ atom_style bond
 #! OPTION 1: LJ bonds
     bond_coeff 1 1 36 -252 1113
     create_bonds many MOBILE MOBILE 1 0.99 1.01
+    write_data INIT.0
 
 #! INCREASE EFFICIENCY: explicitly tell lammps to __NOT__ consider the following pair interactions [ONLY DO THIS AFTER THE BONDS HAVE BEEN CREATED]
     neigh_modify exclude type 1 1
