@@ -1,0 +1,168 @@
+#! 07.01.2019: TRICLINIC VERSION; 08.10.2019: GRAIN VERSION!!!
+
+log LOG.0
+shell "cp in.lmp in.0"
+shell "echo 0 $(date +%d-%b-%Y-%T) START >> JOBINFO"
+
+units lj
+dimension 2
+boundary p p p
+atom_style bond
+#! some variable for setting the structure
+    variable slideLENGHT equal XX
+    variable boxX equal ${slideLENGHT}*2
+    variable boxY equal ${slideLENGHT}*2
+
+#! defining the whole region
+    lattice none 1.0
+    region REGION block 0 ${boxX} 0 ${boxY} -0.05 0.05
+    create_box 3 REGION bond/types 1 extra/bond/per/atom 6
+
+#! sliding lattice "/\/\ | /\/ /\" 
+    lattice sq 1.0
+
+#! sliding region
+    variable yLOW equal (${boxY}-${slideLENGHT})/2
+    variable yHIGH equal ${yLOW}+${slideLENGHT}
+    region slidREGION block 0 ${slideLENGHT} ${yLOW} ${yHIGH} -0.05 0.05
+    create_atoms 1 region slidREGION
+
+#! defining massive group
+    variable xlimi equal 0
+    variable xlimf equal ${slideLENGHT}
+    variable ylimi equal ${yLOW}
+    variable ylimf equal ${yHIGH}
+    variable CHAIN atom (x==${xlimi})||(x==${xlimf})||(y==${ylimi})||(y==${ylimf})
+    group CHAIN variable CHAIN
+    variable CHAIN delete
+
+#! incommensurate lattice; nx is the number of cells along box edge
+    variable nx equal floor(${boxY}*1.61803398875)
+#! incommensurate rho
+    variable rho equal (v_nx/${boxY})^2
+#! include random shift of basis atom (!)
+    variable dx equal random(0,1,91453582)
+    variable dy equal random(0,1,2694257)
+
+    lattice sq ${rho} origin ${dx} ${dy} 0
+    variable SX equal floor(${boxX}*1.61803398875)
+    variable SY equal floor(${boxY}*1.61803398875)
+    
+    region subREGION block 0 ${SX} 0 ${SY} -0.05 0.05
+    create_atoms 2 region subREGION
+
+#! set lattice constant back to 1.0
+    lattice none 1.0
+
+#! deform box to triclinic shape to create __hexagonal__ lattice (!)
+    variable remapL equal ${boxY}/2
+    change_box all y scale 8.660254037844e-01 triclinic xy final ${remapL} remap
+
+#! shift the box down, such that "ylo" is at zero
+    variable dy equal -ylo
+    change_box all y delta ${dy} ${dy} remap
+    variable dy delete
+
+#! defein a group for changing "mass" of the group
+    group MOBILE type 1
+    group STATIC type 2
+    set group CHAIN type 3
+
+#! calculating the number of particle in group MOBILE and CHAIN
+    variable nCHAIN equal count(CHAIN)
+    variable nMOBILE equal count(MOBILE)
+#! defining "mass" for CHAIN and MOBILE. The total "mass" must remain same!
+    variable eMASS equal EPSILON
+    variable MASS  equal 1.0
+    variable chainMASS equal ${MASS}+${eMASS}
+    variable otherMASS equal (${nMOBILE}-${nCHAIN}*${chainMASS})/(${nMOBILE}-${nCHAIN})
+    print ${chainMASS}
+    print ${otherMASS}
+
+#! set the "mass"
+    mass * 1.0
+    mass 1 ${otherMASS}
+    mass 3 ${chainMASS}
+
+    write_data init.0.gz
+
+#! set interaction between MOBILE and STATIC groups
+    pair_style soft 1.5
+    pair_coeff * * 0.0
+#! interaction strength values 0.1 - 0.3 seem reasonable
+    pair_coeff 1 2 0.3 RC
+    pair_coeff 2 3 0.3 RC
+#! create substrate bonds
+    bond_style vink
+
+#! potential energy = (FC/2) x**2
+#! OPTION 1: LJ bonds
+    bond_coeff 1 1 36 -252 1113
+
+    create_bonds many MOBILE MOBILE 1 0.99 1.01
+
+#! INCREASE EFFICIENCY: explicitly tell lammps to __NOT__ consider the following pair interactions [ONLY DO THIS AFTER THE BONDS HAVE BEEN CREATED]
+    neigh_modify exclude type 1 1 exclude type 2 2 exclude type 3 3
+
+#! keep things 2D
+    fix 2D all enforce2d
+
+#! store starting positions of substrate; we need them later to make the movie
+    dump PCA MOBILE custom 1 initdump.0 id type mass x y
+    run 0
+    undump PCA
+
+#! MODIFICATION: I think the displacements should be measured from the perfect lattice positions
+    compute R MOBILE displace/atom
+
+# custom temperature for group MOBILE only (!)
+# fix nvt
+    fix FREEZE STATIC setforce 0 0 0
+    fix NVT MOBILE nvt temp TNVT TNVT $(100.0*dt)
+    run @NEVERY*20
+    unfix NVT
+    unfix FREEZE
+
+    dump PCA MOBILE custom 1 mindump.0 id type x y vx vy
+    run 0
+    undump PCA
+
+#! compute velocity in x and y averaged over all particles
+    compute VEL MOBILE reduce ave vx vy
+    compute TEMP MOBILE temp
+
+#! compute displacement in x and y averaged over all particles
+    compute DSP MOBILE reduce ave c_R[1] c_R[2]
+#! displacement of each atom, with the average subtracted
+    variable DX atom c_R[1]-c_DSP[1]
+    variable DY atom c_R[2]-c_DSP[2]
+    variable UX atom vx-c_VEL[1]
+    variable UY atom vy-c_VEL[2]
+    variable S atom "0.5 * ( (v_UX)^2 + (v_UY)^2 )"
+    compute KES MOBILE reduce sum v_S
+
+#! KICK IT!
+    variable VKICK   equal KICK
+    variable VANGEL  equal ANGEL
+    variable KICKX equal ${VKICK}*cos(${VANGEL})
+    variable KICKY equal ${VKICK}*sin(${VANGEL})
+    velocity MOBILE set ${KICKX} ${KICKY} 0 sum yes
+
+    reset_timestep 0
+    thermo NEVERY
+    thermo_style custom step c_TEMP c_VEL[*] c_DSP[*] ebond ke c_KES
+    thermo_modify norm no
+
+
+    dump PCA MOBILE custom @NEVERY snap.0.gz id type mass x y v_DX v_DY vx vy c_R[1] c_R[2]
+    dump_modify PCA format line "%d %d %13.10g %13.10g %13.10g %13.10g %13.10g %13.10g %13.10g %15.12g %15.12g"
+
+#! also collect velocity histograms, to monitor equilibration
+    fix VX_HISTOGRAM MOBILE ave/histo NEVERY 1 NEVERY -0.1 0.1 51 vx ave one mode vector beyond ignore file hvx.0
+    fix VY_HISTOGRAM MOBILE ave/histo NEVERY 1 NEVERY -0.1 0.1 51 vy ave one mode vector beyond ignore file hvy.0
+
+    fix NVE MOBILE nve
+
+    run NRUN
+
+shell "echo 0 $(date +%d-%b-%Y-%T) FINISH >> JOBINFO"
