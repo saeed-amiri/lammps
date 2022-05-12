@@ -1,0 +1,120 @@
+
+# ----------------- Init Section -----------------
+
+    units real
+    atom_style full
+    bond_style harmonic
+    angle_style harmonic
+    # dihedral_style opls
+    pair_style morse 2.5
+    # pair_modify mix geometric
+
+
+# ----------------- Atom Definition Section -----------------
+
+    read_data "sio2" 
+
+# ----------------- Run Section -----------------
+    # pair_coeff  * * 0.03 1.0
+
+    replicate 5 5 3 
+    write_data replicate.data pair ij
+#
+    minimize 1.0e-7 1.0e-7 1000 10000
+    write_data min.data pair ij
+    # velocity all create 300.0 4928459 rot yes dist gaussian
+    # fix fxnve all nve
+    # fix   fxnpt all npt temp 3000.0 3000.0 100.0 iso 0.0 0.0 1000.0 drag 1.0
+    # fix fxlan all langevin 0.0 3000.0 5000.0 48279 
+    # fix fxnve all nve
+    fix 1 all nvt temp 300.0 3000.0 $(100.0*dt)
+    thermo 1000
+    thermo_style custom step temp density pe ke lx ly lz 
+    dump 1 all atom 100 npt.dump
+    run 100000
+    undump 1
+    unfix 1
+    reset_timestep 1
+    fix 1 all nvt temp 3000.0 300.0 $(100.0*dt)
+    thermo 1000
+    thermo_style custom step temp density pe ke lx ly lz 
+    dump 1 all atom 1000 npt2.dump
+    run 2000000
+    unfix 1
+    # unfix fxlan
+    # unfix fxnve
+    # undump 1
+    # fix fxlan all langevin 3000.0 300.0 5000.0 48279 
+    # fix fxnve all nve
+# 
+    # thermo 1000
+    # thermo_style custom step temp density pe ke lx ly lz 
+    # dump 1 all atom 100 npt2.dump
+    # run 100000
+    # write_restart  system_after_nvt.rst
+
+    # unfix fxnpt
+    # undump 1
+    # fix   fxnpt all npt temp 300.0 300.0 100.0 x 1.0 1.0 1000.0 drag 1.0
+    # thermo_style custom step temp density pe ke lx ly lz 
+    # dump 1 all atom 100 npt2.dump
+    # run 100000
+    # unfix fxnpt
+    # undump 1
+#    unfix fxnpt`
+#    write_data npt.data
+#
+#    replicate 3 3 3 
+
+#    write_data box.data
+#    minimize 1.0e-5 1.0e-7 1000 10000
+#    write_data min_box.data 
+
+#    fix   fxnpt all npt temp 300.0 300.0 100.0 z 1.0 1.0 1000.0 drag 1.0
+#    thermo 10000
+#    thermo_style custom step temp density pe ke lx ly lz 
+#    dump 1 all atom 1000 npt_bix.dump
+#    run 100000
+#    write_data npt_box.data
+    
+
+#    replicate 1 4 4
+#    minimize 1.0e-5 1.0e-7 1000 10000
+#    write_data min_box2.data 
+#    fix   fxnpt all npt temp 300.0 300.0 100.0 z 1.0 1.0 1000.0 drag 1.0
+#    thermo 1000
+#    thermo_style custom step temp density pe ke lx ly lz 
+#    run 20000 
+
+#    write_data npt_box2.data 
+
+#    variable x0 equal xlo
+#    variable y0 equal ylo
+#    variable z0 equal zlo
+#    variable x1 equal xhi
+#    variable y1 equal yhi
+#    variable z1 equal zhi
+#    variable xc equal 0.5*(${x1}-${x0})
+#    variable yc equal 0.5*(${y1}-${y0})
+#    variable zc equal 0.5*(${z1}-${z0})
+#
+#    region 2 sphere ${xc} ${yc} ${zc} 15
+#    delete_atoms region 2 mol yes
+#    reset_atom_ids sort yes
+#    region 2 delete 
+#
+#    variable xc delete 
+#    variable yc delete 
+#    variable zc delete 
+#    variable xc equal 0.5*(${x1}-${x0})
+#    variable yc equal 0.5*(${y1}-${y0})
+#    variable zc equal 0.5*(${z1}-${z0})
+#    variable lxH equal 10
+#
+#    region 2 sphere ${xc} ${yc} ${zc} ${lxH}
+#    delete_atoms region 2 mol yes
+#    reset_atom_ids sort yes
+#    # read_data silica_9nm.data add append offset 3 1 1 1 1 shift 0.0 0.0 50.0 nocoeff
+#    # displace_atoms all move -${x0} -${y0} -${z1}
+#
+#    write_data deleted.data pair ij
