@@ -1,0 +1,131 @@
+ opls_067   15.03500  ; CH3 (C1) ETHANE
+ opls_068   15.03500  ; CH3 (C2) N-ALKANES
+ opls_069   15.03500  ; CH3 (C3) ISOBUTANE
+ opls_070   15.03500  ; CH3 (C4) NEOPENTANE
+ opls_071   14.02700  ; CH2 (SP3) ALKANES
+ opls_072   14.02700  ; CH2 (SP2) 1-ALKENES
+ opls_073   13.01900  ; CH  (SP3) ISOBUTANE
+ opls_074   13.01900  ; CH  (SP2) 2-ALKENES
+ opls_075   13.01900  ; CH (AROM) BENZENOID united atom
+ opls_076   12.01100  ; C   (SP3) NEOPENTANE
+ opls_077   12.01100  ; C   (SP2) ISOBUTENE
+ opls_080   15.03500  ; CH3 IN METHANOL   JPC,90,1276 (1986)
+ opls_081   14.02700  ; CH2 IN ETHANOL    JPC,90,1276 (1986)
+ opls_088   15.03500  ; CH3 IN CH3SH      JPC,90,6379 (1986)
+ opls_089   14.02700  ; CH2 IN CH3CH2SH   JPC,90,6379 (1986)
+ opls_090   15.03500  ; CH3 IN CH3SR      JPC,90,6379 (1986)
+ opls_091   14.02700  ; CH2 IN RCH2SR     JPC,90,6379 (1986)
+ opls_092   15.03500  ; CH3 IN CH3SSR     JPC,90,6379 (1986)
+ opls_093   14.02700  ; CH2 IN RCH2SSR    JPC,90,6379 (1986)
+ opls_094   14.00670  ; N IN CH3CN                   Mol.Phys.,63,547 (1988)
+ opls_095   12.01100  ; C IN CH3CN                   Mol.Phys.,63,547 (1988)
+*opls_111   15.99940  ; O TIP3P Water
+*opls_112    1.00800  ; H TIP3P Water
+ opls_113   15.99940  ; O TIP4P Water
+ opls_114    1.00800  ; H TIP4P Water
+ opls_115    0.00000  ; M TIP4P Water
+ opls_116   15.99940  ; O SPC Water
+ opls_117    1.00800  ; H SPC Water
+ opls_118   15.99940  ; O TIP5P Water
+ opls_119    1.00800  ; H TIP5P Water
+ opls_120    0.00000  ; L TIP5P Water
+*opls_135   12.01100  ; alkane CH3 
+*opls_136   12.01100  ; alkane CH2 
+ opls_137   12.01100  ; alkane CH 
+ opls_138   12.01100  ; alkane CH4 
+ opls_139   12.01100  ; alkane C   
+*opls_140    1.00800  ; alkane H.
+ opls_141   12.01100  ; alkene C (R2-C=) 
+ opls_142   12.01100  ; alkene C (RH-C=) 
+ opls_143   12.01100  ; alkene C (H2-C=) 
+ opls_144    1.00800  ; alkene H (H-C=)  
+ opls_148   12.01100  ; C: CH3, toluene
+ opls_149   12.01100  ; C: CH2, ethyl benzene
+ opls_313   14.00670  ; DAP N-amine
+ opls_314    1.00800  ; DAP H-amine
+*opls_900   14.00670  ; N primary   amines
+ opls_901   14.00670  ; N secondary amines, aziridine N1 
+ opls_902   14.00670  ; N tertiary  amines
+*opls_903   12.01100  ; CH3(N) primary   aliphatic amines, H(C) is #911
+ opls_904   12.01100  ; CH3(N) secondary aliphatic amines, H(C) is #911
+ opls_905   12.01100  ; CH3(N) tertiary  aliphatic amines, H(C) is #911
+*opls_906   12.01100  ; CH2(N) primary   aliphatic amines, H(C) is #911
+ opls_906B  12.01100  ; CA in GLY-NH2 N-terminus
+ opls_907   12.01100  ; CH2(N) secondary aliphatic amines, aziridine  C2,C3H
+ opls_908   12.01100  ; CH2(N) tertiary  aliphatic amines, H(C) is #911
+*opls_909    1.00800  ; H(N)   primary   amines
+ opls_910    1.00800  ; H(N)   secondary amines
+*opls_911    1.00800  ; H(C) for C bonded to N in amines, diamines (aziridine H2,H3)
+ opls_912   12.01100  ; CH     primary isopropyl amine
+ opls_912B  12.01100  ; CA in NH2 N-terminus. All AA except GLY, PRO
+ opls_913   12.01100  ; C      primary t-butyl amine
+ opls_914   12.01100  ; CH     secondary isopropyl amine
+ opls_915   12.01100  ; CH     tertiary  isopropyl amine
+ ______________________________________________________________________
+WATER:
+*opls_111   15.99940  ; O TIP3P Water
+*opls_112    1.00800  ; H TIP3P Water
+DECANE:
+*opls_135   12.01100  ; alkane CH3 
+*opls_136   12.01100  ; alkane CH2 
+*opls_140    1.00800  ; alkane H.
+OCTADCYLAMINE:
+*opls_900   14.00670  ; N      primary   amines
+*opls_903   12.01100  ; CH3(N) primary   aliphatic amines, H(C) is #911
+*opls_906   12.01100  ; CH2(N) primary   aliphatic amines, H(C) is #911
+*opls_909    1.00800  ; H(N)   primary   amines
+*opls_911    1.00800  ; H(C) for C bonded to N in amines, diamines (aziridine H2,H3)
+
+[ atomtypes ]
+; full atom descriptions are available in ffoplsaa.atp
+;       name  bond_type    mass    charge   ptype          sigma      epsilon
+
+ opls_111   OW	8   15.99940    -0.834       A    3.15061e-01  6.36386e-01
+ opls_112   HW	1    1.00800     0.417       A    0.00000e+00  0.00000e+00
+
+ opls_135   CT	6   12.01100    -0.180       A    3.50000e-01  2.76144e-01
+ opls_136   CT	6   12.01100    -0.120       A    3.50000e-01  2.76144e-01
+ opls_140   HC	1    1.00800     0.060       A    2.50000e-01  1.25520e-01
+
+ opls_135 1 CH3    CT  6   12.01100    -0.180       A    3.50000e-01  2.76144e-01
+ opls_136 2 CH2    CT  6   12.01100    -0.120       A    3.50000e-01  2.76144e-01
+ opls_140 3 H      HC	 1    1.00800     0.060       A    2.50000e-01  1.25520e-01
+ opls_906 4 CH2(N) CT  6   12.01100     0.060       A    3.50000e-01  2.76144e-01
+ opls_911 5 HC(N)  HC  1    1.00800     0.060       A    2.50000e-01  6.27600e-02
+ opls_900 6 N      NT  7   14.00670    -0.900       A    3.30000e-01  7.11280e-01
+ opls_909 7 HN     H   1    1.00800     0.360       A    0.00000e+00  0.00000e+00
+
+[ bondtypes ]
+; i    j  func       b0          kb
+DECANE
+  CT    HC      1    0.10900   284512.0   ; CHARMM 22 parameter file
+  CT    CT      1    0.15290   224262.4   ; CHARMM 22 parameter file
+OCTADCYLAMINE
+  CT    HC      1    0.10900   284512.0   ; CHARMM 22 parameter file
+  CT    CT      1    0.15290   224262.4   ; CHARMM 22 parameter file
+  CT    NT      1    0.14480   319657.6   ; -idem-
+  H     NT      1    0.10100   363171.2   ; 
+
+[ angletypes ]
+;  i    j    k  func       th0       cth
+1  CT     CT     CT      1   112.700    488.273   ; CHARMM 22 parameter file
+2  CT     CT     NT      1   109.470    470.281   ; wlj - MM3 based - JACS 112, 8314 (90)
+3  HC     CT     HC      1   107.800    276.144   ; CHARMM 22 parameter file
+4  H      NT     H       1   106.400    364.845   ; wlj MM3 based   
+5  CT     CT     HC      1   110.700    313.800   ; CHARMM 22 parameter file
+6  CT     NT     H       1   109.500    292.880   ; 
+7  HC     CT     NT      1   109.500    292.880   ; JACS 115, 9620 (93)
+  
+[ dihedraltypes ]
+;  i    j    k    l   func     coefficients
+; OPLS Fourier dihedraltypes translated to Gromacs Ryckaert-Bellemans form
+; according to the formula in the Gromacs manual.
+1 CT     CT     CT     CT      3      2.92880  -1.46440   0.20920  -1.67360   0.00000   0.00000 ; hydrocarbon all-atom
+2 CT     CT     CT     NT      3      3.33465  -1.55226   2.82001  -4.60240   0.00000   0.00000 ; amine all-atom 
+3 CT     CT     CT     HC      3      0.62760   1.88280   0.00000  -2.51040   0.00000   0.00000 ; hydrocarbon all-atom
+4 CT     CT     NT     H       3     -1.26775   3.02085   1.74473  -3.49782   0.00000   0.00000 ; amine all-atom
+5 CT     NT     CT     HC      3      1.17152   3.51456   0.00000  -4.68608   0.00000   0.00000 ; amine all-atom
+6 HC     CT     CT     HC      3      0.62760   1.88280   0.00000  -2.51040   0.00000   0.00000 ; hydrocarbon *new* 11/99
+7 H      NT     CT     HC      3      0.83680   2.51040   0.00000  -3.34720   0.00000   0.00000 ; amine all-atom
+  HC     CT     CT     NT      3     -4.09614   5.08775   2.96645  -3.95806   0.00000   0.00000 ; amine all-atom
+  CT     CT     NT     CT      3      1.78866   3.49154   0.53555  -5.81576   0.00000   0.00000 ; amine all-atom
