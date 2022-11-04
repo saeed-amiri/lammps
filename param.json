@@ -1,8 +1,10 @@
 {
     "files": [
         {
-"file": "ODA.data",
+"file": "ODA_clean.data",
 "symb": "O",
+"style": "lj/cut/coul/long 10.0 14.0",
+"mix": "arithmetic",
 "atoms": [
 	{
 	"type": 1, "name": "CH3", "sigma": 3.5,	"epsilon": 0.066, "mass": 12.011, "charge": -0.18, "oplsaa": 135
@@ -63,7 +65,7 @@
 	"type": 7, "name": "(hc_ct_nt)", "style": "harmonic", "kangle": 70.0, "angle": 109.500
 	}
   ],
-"dihedrlas": [
+"dihedrals": [
 	{
 	"type": 1, "name": "(ct_ct_ct_ct)", "style": "opls", "k1":  1.300, "k2": -0.050,"k3": 0.200,"k4": 0.000
 	},
@@ -84,12 +86,16 @@
 	},
 	{
 	"type": 7, "name": "(ct_nt_hc_hn)", "style": "opls", "k1":  0.000, "k2":  0.000,"k3": 0.400,"k4": 0.000
-	},
-	{
-	"type": 8, "name": "(ct_nt_hc_hn)", "style": "opls", "k1":  0.000, "k2":  0.000,"k3": 0.400,"k4": 0.000
 	}
   ]
 }
+    ],
+	"Pairs": [
+        {
+            "pair": "OO",
+            "style": "lj/cut/coul/long 10.0 14.0",
+            "mix": "arithmetic"
+        }
     ]
 }
 
