@@ -7,7 +7,7 @@
 111 angles
 7 angle types
 159 dihedrals
-8 dihedral types
+7 dihedral types
 
   -3.399   22.000 xlo xhi
   -1.074    3.074 ylo yhi
@@ -276,7 +276,7 @@ Dihedrals
 13 1 38 41 44 47 # CH2_CH2_CH2_CH2 (ct_ct_ct_ct)
 14 1 41 44 47 50 # CH2_CH2_CH2_CH2 (ct_ct_ct_ct)
 15 1 44 47 50 53 # CH2_CH2_CH2_CT (ct_ct_ct_ct)
-16 8 47 50 53 56 # CH2_CH2_CT_NT (ct_ct_nt_ct)
+16 2 47 50 53 56 # CH2_CH2_CT_NT (ct_ct_ct_nt)
 17 3 1 5 8 9 # CH3_CH2_CH2_HC (ct_ct_ct_hc)
 18 3 1 5 8 10 # CH3_CH2_CH2_HC (ct_ct_ct_hc)
 19 3 2 1 5 8 # HC_CH3_CH2_CH2 (ct_ct_ct_hc)
